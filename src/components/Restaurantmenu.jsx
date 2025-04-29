@@ -7,7 +7,6 @@ function Restaurantmenu() {
   const [restaurantinfo, setrestaurantinfo] = useState([]);
   const [discoundData, setdiscoundData] = useState([]);
   const [menuData, setmenuData] = useState([]);
-  console.log(restaurantinfo);
 
   async function fetchData() {
     try {
@@ -17,16 +16,16 @@ function Restaurantmenu() {
       const res = await fetch(proxyUrl + encodeURIComponent(targetUrl));
 
       const data = await res.json();
-      // console.log(
-      //   data?.data?.cards[4]?.groupedCard?.cardGroupMap?.REGULAR?.cards[1]?.card
-      //     ?.card
-      // );
+      console.log(
+        data?.data?.cards[5]?.groupedCard?.cardGroupMap?.REGULAR?.cards[1]?.card
+          ?.card?.itemCards
+      );
       setrestaurantinfo(data?.data?.cards[2]?.card?.card?.info);
       setdiscoundData(
         data?.data?.cards[3]?.card?.card?.gridElements?.infoWithStyle?.offers
       );
       setmenuData(
-        data?.data?.cards[4]?.groupedCard?.cardGroupMap?.REGULAR?.cards[1]?.card
+        data?.data?.cards[5]?.groupedCard?.cardGroupMap?.REGULAR?.cards[1]?.card
           ?.card?.itemCards
       );
     } catch (err) {
@@ -71,7 +70,9 @@ function Restaurantmenu() {
                 <span>{restaurantinfo?.costForTwoMessage}</span>
               </div>
               <div className="mb-3">
-                <span className="flex text-sm font-medium text-orange-400 underline">{restaurantinfo?.cuisines}</span>
+                <span className="flex text-sm font-medium text-orange-400 underline">
+                  {restaurantinfo?.cuisines}
+                </span>
               </div>
               <div className="flex items-center gap-3 mb-4">
                 <div className="flex flex-col items-center w-fit">
@@ -82,9 +83,13 @@ function Restaurantmenu() {
                 <div>
                   <div className="flex gap-3 text-sm font-medium">
                     <h3>outlate</h3>
-                    <h5 className="text-black/60">{restaurantinfo?.locality}</h5>
+                    <h5 className="text-black/60">
+                      {restaurantinfo?.locality}
+                    </h5>
                   </div>
-                  <h3 className="text-sm font-medium">{restaurantinfo?.sla?.slaString}</h3>
+                  <h3 className="text-sm font-medium">
+                    {restaurantinfo?.sla?.slaString}
+                  </h3>
                 </div>
               </div>
               <div className="flex gap-2 pt-3 border-t border-gray-70 text-sm font-medium">
@@ -100,7 +105,9 @@ function Restaurantmenu() {
                 </div>
                 <span>4.5km</span>
                 <span>|</span>
-                <span className="line-clamp-1">{restaurantinfo?.slugString}</span>
+                <span className="line-clamp-1">
+                  {restaurantinfo?.slugString}
+                </span>
               </div>
             </div>
           </div>
