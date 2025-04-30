@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router";
+import Discountbox from "./Discountbox";
 
 function Restaurantmenu() {
   const { id } = useParams();
@@ -16,18 +17,17 @@ function Restaurantmenu() {
       const res = await fetch(proxyUrl + encodeURIComponent(targetUrl));
 
       const data = await res.json();
-      console.log(
-        data?.data?.cards[5]?.groupedCard?.cardGroupMap?.REGULAR?.cards[1]?.card
-          ?.card?.itemCards
-      );
+      console.log(data?.data?.cards[5]?.groupedCard?.cardGroupMap?.REGULAR);
+
+
       setrestaurantinfo(data?.data?.cards[2]?.card?.card?.info);
+
+
       setdiscoundData(
         data?.data?.cards[3]?.card?.card?.gridElements?.infoWithStyle?.offers
       );
-      setmenuData(
-        data?.data?.cards[5]?.groupedCard?.cardGroupMap?.REGULAR?.cards[1]?.card
-          ?.card?.itemCards
-      );
+      setmenuData((data?.data?.cards[5]?.groupedCard?.cardGroupMap?.REGULAR).filter((data)=>data?.card?.card?.itemcards));
+      console.log(menuData);
     } catch (err) {
       console.error("Error fetching data:", err);
     }
@@ -36,6 +36,31 @@ function Restaurantmenu() {
   useEffect(() => {
     fetchData();
   }, []);
+  const CARD_WIDTH = 350;
+
+  const sliderRef = useRef(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const scrollToIndex = (index) => {
+    if (sliderRef.current) {
+      sliderRef.current.style.transform = `translateX(-${
+        index * CARD_WIDTH
+      }px)`;
+    }
+  };
+
+  const handleRightClick = () => {
+    const newIndex = (currentIndex + 1) % discoundData.length;
+    setCurrentIndex(newIndex);
+    scrollToIndex(newIndex);
+  };
+
+  const handleLeftClick = () => {
+    const newIndex =
+      (currentIndex - 1 + discoundData.length) % discoundData.length;
+    setCurrentIndex(newIndex);
+    scrollToIndex(newIndex);
+  };
 
   return (
     <>
@@ -111,6 +136,72 @@ function Restaurantmenu() {
               </div>
             </div>
           </div>
+        </div>
+        <div className="flex justify-between items-center mt-5">
+          <h3 className="text-2xl font-semibold select-none pointer-events-none">
+            Deals for you
+          </h3>
+          <div className="flex gap-5">
+            <div
+              className="p-3 cursor-pointer rounded-full transition-colors bg-gray-70 left__button"
+              onClick={handleLeftClick}
+            >
+              {/* Left Arrow */}
+              <svg
+                className="h-7.5 w-7.5"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M7.82843 10.9999H20V12.9999H7.82843L13.1924 18.3638L11.7782 19.778L4 11.9999L11.7782 4.22168L13.1924 5.63589L7.82843 10.9999Z" />
+              </svg>
+            </div>
+            <div
+              className="p-3 cursor-pointer rounded-full transition-colors bg-gray-70 right__button"
+              onClick={handleRightClick}
+            >
+              {/* Right Arrow */}
+              <svg
+                className="h-7.5 w-7.5"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div className="relative mt-12.5 mb-10 h-[150px] overflow-hidden">
+          <div
+            ref={sliderRef}
+            className="flex gap-5 absolute top-0 left-0 transition-transform duration-500"
+            style={{ width: `${discoundData.length * CARD_WIDTH}px` }}
+          >
+            {discoundData?.map((data) => (
+              <div
+                style={{ width: `${CARD_WIDTH}px`, flexShrink: 0 }}
+                key={data.info.restId}
+              >
+                <Discountbox data={data} />
+              </div>
+            ))}
+          </div>
+        </div>
+        <h2 className="text-lg font-semibold tracking-widest text-center">
+          MENU
+        </h2>
+        <div className="w-full bg-gray-70 py-3 text-black text-center text-base font-medium mt-4 rounded-md relative cursor-pointer hover:bg-gray-200 transition-all duration-200 ease-in-out">
+          Seacrh for dishes
+          <svg
+            className="h-5 w-5 absolute top-[50%] translate-y-[-50%] right-3"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <path d="M11 2C15.968 2 20 6.032 20 11C20 15.968 15.968 20 11 20C6.032 20 2 15.968 2 11C2 6.032 6.032 2 11 2ZM11 18C14.8675 18 18 14.8675 18 11C18 7.1325 14.8675 4 11 4C7.1325 4 4 7.1325 4 11C4 14.8675 7.1325 18 11 18ZM19.4853 18.0711L22.3137 20.8995L20.8995 22.3137L18.0711 19.4853L19.4853 18.0711Z"></path>
+          </svg>
         </div>
       </section>
     </>
