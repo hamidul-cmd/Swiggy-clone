@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router";
 import Discountbox from "./Discountbox";
+import ItemCird from "./ItemCird";
 
 function Restaurantmenu() {
   const { id } = useParams();
@@ -8,6 +9,11 @@ function Restaurantmenu() {
   const [restaurantinfo, setrestaurantinfo] = useState([]);
   const [discoundData, setdiscoundData] = useState([]);
   const [menuData, setmenuData] = useState([]);
+  const [menuopen, setmenuopen] = useState(false);
+  const handleToggle = (index) => {
+    setmenuopen((prevIndex) => (prevIndex === index ? null : index));
+  };
+
 
   async function fetchData() {
     try {
@@ -17,17 +23,25 @@ function Restaurantmenu() {
       const res = await fetch(proxyUrl + encodeURIComponent(targetUrl));
 
       const data = await res.json();
-      console.log(data?.data?.cards[5]?.groupedCard?.cardGroupMap?.REGULAR);
-
+      //  console.log( data?.data?.cards?.[4]?.groupedCard?.cardGroupMap?.REGULAR?.cards);
 
       setrestaurantinfo(data?.data?.cards[2]?.card?.card?.info);
-
 
       setdiscoundData(
         data?.data?.cards[3]?.card?.card?.gridElements?.infoWithStyle?.offers
       );
-      setmenuData((data?.data?.cards[5]?.groupedCard?.cardGroupMap?.REGULAR).filter((data)=>data?.card?.card?.itemcards));
-      console.log(menuData);
+      const regularCards =
+        data?.data?.cards?.[4]?.groupedCard?.cardGroupMap?.REGULAR?.cards;
+
+      if (Array.isArray(regularCards)) {
+        const filteredCards = regularCards.filter(
+          (card) => card?.card?.card?.itemCards || card?.card?.card?.categories
+        );
+        setmenuData(filteredCards);
+      } else {
+        console.error("REGULAR cards not found or not an array.");
+        setmenuData([]); // Or handle it another way
+      }
     } catch (err) {
       console.error("Error fetching data:", err);
     }
@@ -61,7 +75,7 @@ function Restaurantmenu() {
     setCurrentIndex(newIndex);
     scrollToIndex(newIndex);
   };
-
+  // console.log(menuData);
   return (
     <>
       <section className="max-w-[1000px] m-auto pt-12.5">
@@ -202,6 +216,119 @@ function Restaurantmenu() {
           >
             <path d="M11 2C15.968 2 20 6.032 20 11C20 15.968 15.968 20 11 20C6.032 20 2 15.968 2 11C2 6.032 6.032 2 11 2ZM11 18C14.8675 18 18 14.8675 18 11C18 7.1325 14.8675 4 11 4C7.1325 4 4 7.1325 4 11C4 14.8675 7.1325 18 11 18ZM19.4853 18.0711L22.3137 20.8995L20.8995 22.3137L18.0711 19.4853L19.4853 18.0711Z"></path>
           </svg>
+        </div>
+        <div className="manuwrapper mt-6 space-y-3">
+          {menuData &&
+            menuData.map((data, index) => {
+
+              if (data.card.card.itemCards) {
+                return (
+                  <div>
+                    <div
+                      
+                      className="flex justify-between items-center p-3 cursor-pointer border-b-2 border-gray-400"
+                    >
+                      <h3 className="text-xl font-bold">
+                        {data.card.card.title}{" "}
+                        <span className="text-gray-70">
+                          ({data.card.card.itemCards.length})
+                        </span>
+                      </h3>
+                      <div
+                        className={`transition-all duration-200 ease-in-out`}
+                      >
+                        <svg
+                          className="h-5 w-5"
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                        >
+                          <path d="M11.9999 13.1714L16.9497 8.22168L18.3639 9.63589L11.9999 15.9999L5.63599 9.63589L7.0502 8.22168L11.9999 13.1714Z"></path>
+                        </svg>
+                      </div>
+                    </div>
+                    {data.card.card.itemCards.map((item) => {
+                      return (
+                        <div
+                          key={item.card.info.id}
+                          className={`px-7.5`}
+                        >
+                          <ItemCird data={item.card.info} />
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              } else {
+                return (
+                  <div>
+                    <div
+                      className="flex justify-between items-center p-3 cursor-pointer border-b-2 border-gray-400"
+                    >
+                      <h3 className="text-xl font-bold">
+                        {data.card.card.title}{" "}
+                        <span className="text-gray-70">
+                          ({data.card.card.categories.length})
+                        </span>
+                      </h3>
+                      <div
+                        className={` transition-all duration-200 ease-in-out`}
+                      >
+                        <svg
+                          className="h-5 w-5"
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                        >
+                          <path d="M11.9999 13.1714L16.9497 8.22168L18.3639 9.63589L11.9999 15.9999L5.63599 9.63589L7.0502 8.22168L11.9999 13.1714Z"></path>
+                        </svg>
+                      </div>
+                    </div>
+                    {data.card.card.categories.map((data, index) => {
+                      return (
+                        <div className="ml-7.5 mt-7.5">
+                          <div
+                            onClick={() => handleToggle(index)}
+                            className="flex justify-between items-center p-3 cursor-pointer border-b-2 border-gray-400	"
+                          >
+                            <h3 className="text-lg font-medium">
+                              {data.title}{" "}
+                              <span className="text-gray-70">
+                                ({data.itemCards.length})
+                              </span>
+                            </h3>
+                            <div
+                              className={` transition-all duration-200 ease-in-out`}
+                            >
+                              <svg
+                                className="h-5 w-5"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="currentColor"
+                              >
+                                <path d="M11.9999 13.1714L16.9497 8.22168L18.3639 9.63589L11.9999 15.9999L5.63599 9.63589L7.0502 8.22168L11.9999 13.1714Z"></path>
+                              </svg>
+                            </div>
+                          </div>
+                          <div className="py-7.5">
+                          {data.itemCards.map((item) => {
+                            return (
+                              <div
+                                key={item.card.info.id}
+                                className={`px-7.5`}
+                              >
+                                <ItemCird data={item.card.info} />
+                              </div>
+                            );
+                          })}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              }
+            })}
         </div>
       </section>
     </>

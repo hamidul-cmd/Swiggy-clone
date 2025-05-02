@@ -1,10 +1,38 @@
 import React, { useState, useEffect, useRef } from "react";
 import ToprestaurantCird from "./ToprestaurantCird";
 
-function Toprestaurant({ data }) {
+function Toprestaurant() {
   const [translate, setTranslate] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0);
   const containerRef = useRef(null);
+  const [toprestaurantData, settoprestaurantData] = useState([]);
+
+  async function fetchData() {
+    try {
+      const proxyUrl = "https://corsproxy.io/?";
+      const targetUrl =
+        "https://www.swiggy.com/dapi/restaurants/list/v5?lat=18.9690247&lng=72.8205292&is-seo-homepage-enabled=true&page_type=DESKTOP_WEB_LISTING";
+
+      const res = await fetch(proxyUrl + encodeURIComponent(targetUrl));
+
+      if (!res.ok) {
+        throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
+      }
+
+      const data = await res.json();
+      settoprestaurantData(
+        data?.data?.cards[1]?.card?.card?.gridElements?.infoWithStyle
+          ?.restaurants
+      );
+    } catch (err) {
+      console.error("Error fetching data:", err);
+    }
+  }
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+  
 
   // Calculate the maximum number of slides
   const cardWidth = 273; // Width of each card
@@ -93,7 +121,7 @@ function Toprestaurant({ data }) {
             style={{ transform: `translateX(${translate}px)` }}
             className="absolute top-0 left-0 flex gap-6 transition-all duration-150 ease-in"
           >
-            {data.map((data) => {
+            {toprestaurantData.map((data) => {
               return <ToprestaurantCird data={data} key={data.info.id} />;
             })}
           </div>

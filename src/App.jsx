@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import Header from "./components/Header";
-import WhatsOnYourMind from "./components/WhatsOnYourMind";
-import Toprestaurant from "./components/Toprestaurant";
-import Restaurantindelhi from "./components/Restaurantindelhi";
 import Body from "./components/Body";
 import Restaurantmenu from "./components/Restaurantmenu";
 
