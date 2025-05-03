@@ -21,7 +21,10 @@ function ItemCird({ data }) {
         )}
 
         <h3 className="text-lg font-semibold">{data.name}</h3>
-        <h5 className="text-base font-medium">₹{data.price / 100}</h5>
+        <h5 className="text-base font-medium">
+          ₹{data.price && data.price / 100}
+          {data.defaultPrice && data.defaultPrice / 100}
+        </h5>
         <div className="flex gap-1 text-sm font-medium">
           <span>
             <svg
@@ -33,16 +36,17 @@ function ItemCird({ data }) {
               <path d="M12.0006 18.26L4.94715 22.2082L6.52248 14.2799L0.587891 8.7918L8.61493 7.84006L12.0006 0.5L15.3862 7.84006L23.4132 8.7918L17.4787 14.2799L19.054 22.2082L12.0006 18.26Z"></path>
             </svg>
           </span>
-          <span>{data.ratings.aggregatedRating.rating}</span>
+          {data.ratings.aggregatedRating.rating && (
+            <span>{data.ratings.aggregatedRating.rating}</span>
+          )}
+
           {data.ratings.aggregatedRating.ratingCountV2 ? (
             <span>({data.ratings.aggregatedRating.ratingCountV2})</span>
           ) : (
             <span>(0)</span>
           )}
         </div>
-        <p className=" text-sm font-medium text-gray-35">
-          {data.description}
-        </p>
+        <p className=" text-sm font-medium text-gray-35">{data.description}</p>
       </div>
       <div className="relative w-[30%]">
         <img

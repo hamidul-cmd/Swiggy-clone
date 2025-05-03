@@ -24,6 +24,7 @@ function Toprestaurant() {
         data?.data?.cards[1]?.card?.card?.gridElements?.infoWithStyle
           ?.restaurants
       );
+      
     } catch (err) {
       console.error("Error fetching data:", err);
     }
@@ -32,7 +33,7 @@ function Toprestaurant() {
   useEffect(() => {
     fetchData();
   }, []);
-  
+
 
   // Calculate the maximum number of slides
   const cardWidth = 273; // Width of each card
@@ -51,7 +52,7 @@ function Toprestaurant() {
   // Handle next slide
   function handleNext() {
     const visibleCards = getVisibleCards();
-    const maxIndex = Math.max(0, data.length - visibleCards);
+    const maxIndex = Math.max(0, toprestaurantData.length - visibleCards);
     const isCurrentlyAtEnd = currentIndex >= maxIndex;
 
     if (isCurrentlyAtEnd) {
@@ -67,7 +68,7 @@ function Toprestaurant() {
   // Handle previous slide
   function handlePrev() {
     const visibleCards = getVisibleCards();
-    const maxIndex = Math.max(0, data.length - visibleCards);
+    const maxIndex = Math.max(0, toprestaurantData.length - visibleCards);
     const isCurrentlyAtStart = currentIndex === 0;
 
     if (isCurrentlyAtStart) {
@@ -85,7 +86,7 @@ function Toprestaurant() {
       <section className="max-w-[1500px] m-auto">
         <div className="flex justify-between items-center">
           <h3 className="text-2xl font-semibold select-none pointer-events-none capitalize">
-            top restaurant chines in delhi
+          Top restaurant chains in Mumbai
           </h3>
           <div className="flex gap-5">
             <div

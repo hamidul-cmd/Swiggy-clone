@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 import { Link, Outlet } from "react-router-dom";
+import { Visibility } from "../context/contextApi";
 
 function Header() {
   const navlinks = [
@@ -90,6 +91,46 @@ function Header() {
       ),
     },
   ];
+  const { searchbaropen, setsearchbaropen } = useContext(Visibility);
+  const [searchdata, setsearchdata] = useState([]);
+  async function fetchData(value) {
+    if(value.length===0){
+      setsearchdata([]);
+      return;
+    }
+    try {
+      const proxyUrl = "https://corsproxy.io/?";
+      const targetUrl =(`https://www.swiggy.com/dapi/misc/place-autocomplete?input=${value}`);
+
+      const res = await fetch(proxyUrl + encodeURIComponent(targetUrl));
+
+      if (!res.ok) {
+        throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
+      }
+
+      const data = await res.json();
+      console.log(data?.data);
+
+      setsearchdata(data?.data);
+    } catch (err) {
+      console.error("Error fetching data:", err);
+    }
+  }
+  async function fatchLatandLng(id) {
+    console.log(id);
+      const proxyUrl = "https://corsproxy.io/?";
+      const targetUrl =(`https://www.swiggy.com/dapi/misc/address-recommend?place_id=${id}`);
+
+      const res = await fetch(proxyUrl + encodeURIComponent(targetUrl));
+
+      if (!res.ok) {
+        throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
+      }
+
+      const placedata = await res.json();
+      console.log(placedata);
+
+  }
   return (
     <>
       <header className="select-none">
@@ -102,7 +143,10 @@ function Header() {
                 className="h-12.5"
               />
             </Link>
-            <div className="flex items-center gap-1 cursor-pointer">
+            <div
+              onClick={() => setsearchbaropen(!searchbaropen)}
+              className="flex items-center gap-1 cursor-pointer"
+            >
               <span className="text-base font-medium no-select">other</span>
               <span>
                 <svg
@@ -134,7 +178,49 @@ function Header() {
           </div>
         </div>
       </header>
-      <Outlet/>
+      <section
+        className={`fixed p-7.5 top-0 left-0 h-screen w-[40vw] bg-white z-[500] transition-all duration-300 ease-linear ${
+          searchbaropen ? "translate-x-0" : "translate-x-[-100%]"
+        }`}
+      >
+        <div
+          onClick={() => setsearchbaropen(!searchbaropen)}
+          className="absolute top-7.5 right-7.5 cursor-pointer"
+        >
+          <svg
+            className="h-7.5 w-7.5"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <path d="M10.5859 12L2.79297 4.20706L4.20718 2.79285L12.0001 10.5857L19.793 2.79285L21.2072 4.20706L13.4143 12L21.2072 19.7928L19.793 21.2071L12.0001 13.4142L4.20718 21.2071L2.79297 19.7928L10.5859 12Z"></path>
+          </svg>
+        </div>
+        <div>
+          <input
+            type="text"
+            placeholder="Search for restaurants"
+            className="py-3 px-2.5 outline-none border-2 border-gray-70 active:shadow-md rounded-md"
+            onChange={(e) => fetchData(e.target.value)}
+          />
+          <ul className="space-y-5 mt-7.5">
+            {searchdata?.map((data, index) => {
+              return (
+                <li onClick={()=>fatchLatandLng(data.place_id)} key={index} className="">
+                  <span className="block text-base font-medium">
+                    {data.structured_formatting.main_text}
+                  </span>{" "}
+                  <span className="text-sm font-medium text-gray-60">
+                    {data.structured_formatting.secondary_text}
+                  </span>  
+                </li>
+                
+              );
+            })}
+          </ul>
+        </div>
+      </section>
+      <Outlet />
     </>
   );
 }

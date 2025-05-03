@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import Header from "./components/Header";
 import Body from "./components/Body";
 import Restaurantmenu from "./components/Restaurantmenu";
+import { Visibility } from "./context/contextApi";
 
 function App() {
   const [posts, setPosts] = useState([]);
@@ -10,7 +11,7 @@ function App() {
   const [onlinerestaurantdata, setonlinerestaurantdata] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const [searchbaropen, setsearchbaropen] = useState(false);
   // Disable design mode to prevent text selection/editing
   useEffect(() => {
     document.designMode = "off";
@@ -97,22 +98,27 @@ function App() {
     fetchData();
   }, []);
 
+
   return (
-    <Routes>
-      <Route path="/" element={<Header />}>
-        <Route
-          path="/"
-          element={
-            <Body
-              posts={posts}
-              toprestaurantData={toprestaurantData}
-              onlinerestaurantdata={onlinerestaurantdata}
-            />
-          }
-        ></Route>
-        <Route path="/restaurantmenu/:id" element={<Restaurantmenu/>} />
-      </Route>
-    </Routes>
+    <Visibility.Provider value={{searchbaropen, setsearchbaropen}}>
+      <div className={`${searchbaropen?"overflow-hidden h-screen":"overflow-auto"}`}>
+        <Routes>
+          <Route path="/" element={<Header />}>
+            <Route
+              path="/"
+              element={
+                <Body
+                  posts={posts}
+                  toprestaurantData={toprestaurantData}
+                  onlinerestaurantdata={onlinerestaurantdata}
+                />
+              }
+            ></Route>
+            <Route path="/restaurantmenu/:id" element={<Restaurantmenu />} />
+          </Route>
+        </Routes>
+      </div>
+    </Visibility.Provider>
   );
 }
 
